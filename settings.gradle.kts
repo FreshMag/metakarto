@@ -38,4 +38,4 @@ gitHooks {
     createHooks(overwriteExisting = true)
 }
 
-rootProject.name = "placeholder-project_name"
+rootProject.name = "metakarto"

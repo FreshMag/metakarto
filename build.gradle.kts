@@ -10,7 +10,6 @@ import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.antlr.kotlin)
     alias(libs.plugins.dokka)
     alias(libs.plugins.gitSemVer)
     alias(libs.plugins.kotlin.multiplatform)
@@ -22,7 +21,7 @@ plugins {
     alias(libs.plugins.mavenPublish)
 }
 
-group = "placeholder-group"
+group = "io.github.freshmag"
 
 repositories {
     google()
@@ -65,7 +64,7 @@ kotlin {
     }
 
     js(IR) {
-        moduleName = "placeholder-module_name"
+        moduleName = "metakarto"
         browser()
         nodejs()
         binaries.library()
@@ -95,7 +94,7 @@ publishing {
     repositories {
         maven {
             name = "githubPackages"
-            url = uri("https://maven.pkg.github.com/placeholder-author/placeholder-repo")
+            url = uri("https://maven.pkg.github.com/FreshMag/metakarto")
             credentials(PasswordCredentials::class)
         }
     }
@@ -103,30 +102,30 @@ publishing {
 
 mavenPublishing {
     pom {
-        name.set("placeholder-project_name")
-        description.set("placeholder-description")
-        inceptionYear.set("placeholder-year")
-        url.set("https://github.com/placeholder-author/placeholder-repo")
+        name.set("metakarto")
+        description.set("Translate everything to a map and validate it: JSON, YAML, Markdown, XML and more")
+        inceptionYear.set("2025")
+        url.set("https://maven.pkg.github.com/FreshMag/metakarto")
 
         licenses {
             license {
-                name.set("placeholder-license")
-                url.set("placeholder-license_url")
+                name.set("Apache License 2.0")
+                url.set("https://opensource.org/license/Apache-2.0/")
             }
         }
 
         // Specify developer information
         developers {
             developer {
-                id.set("placeholder-author")
-                name.set("placeholder-author_name")
-                email.set("<<DEVELOPER_EMAIL>>")
+                id.set("FreshMag")
+                name.set("Francesco Magnani")
+                email.set("magnani.franci2000@gmail.com")
             }
         }
 
         // Specify SCM information
         scm {
-            url.set("https://github.com/<<AUTHOR>>/<<REPO>>")
+            url.set("https://github.com/FreshMag/metakarto")
         }
     }
     // Enable GPG signing for all publications
@@ -146,7 +145,7 @@ detekt {
 npmPublish {
     packages {
         named("js") {
-            packageName = "<<PACKAGE_NAME>>"
+            packageName = "metakarto"
         }
     }
 

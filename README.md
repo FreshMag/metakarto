@@ -1,2 +1,3 @@
-# kotlin-multiplatform-template
-A template for Kotlin Multiplatform repositories, with Github Actions for publishing on Maven, npmjs and Github packages
+# Metakarto
+
+Translate everything to a map and validate it: JSON, YAML, Markdown, XML and more.
