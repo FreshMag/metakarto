@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2024, Francesco Magnani, Luca Rubboli,
+ * Copyright (c) 2025, Francesco Magnani
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
- *  This file is part of Subjekt, and is distributed under the terms of the Apache License 2.0, as described in the
+ *  This file is part of Metakarto, and is distributed under the terms of the Apache License 2.0, as described in the
  *  LICENSE file in this project's repository's top directory.
  *
  */
