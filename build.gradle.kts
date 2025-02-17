@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.multiJvmTesting)
     alias(libs.plugins.taskTree)
     alias(libs.plugins.mavenPublish)
+    alias(libs.plugins.serialization)
 }
 
 group = "io.github.freshmag"
@@ -49,8 +50,10 @@ kotlin {
     }
 
     sourceSets {
-        commonMain {
-            dependencies {}
+        commonMain.dependencies {
+            implementation(libs.yamlkt)
+            implementation(libs.json)
+            implementation(libs.kotlinx.io)
         }
 
         commonTest.dependencies {
