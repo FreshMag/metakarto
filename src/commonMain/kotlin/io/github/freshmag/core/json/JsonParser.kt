@@ -7,6 +7,9 @@ import io.github.freshmag.utils.JsonUtils.toAnyMap
 import io.github.freshmag.utils.JsonUtils.toJsonMap
 import io.github.freshmag.utils.MapUtils.checkNulls
 
+/**
+ * A parser that converts a JSON string into a map of (String, Element).
+ */
 class JsonParser : MapParser {
     override fun parse(source: String): Map<String, Element> =
         source
