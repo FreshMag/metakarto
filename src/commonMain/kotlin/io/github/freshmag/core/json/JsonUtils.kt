@@ -1,4 +1,4 @@
-package io.github.freshmag.utils
+package io.github.freshmag.core.json
 
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -21,7 +21,7 @@ object JsonUtils {
     internal fun String.toJsonMap(): Map<String, JsonElement> {
         val json = Json { ignoreUnknownKeys = true }
         return json.decodeFromString(
-            MapSerializer(String.serializer(), JsonElement.serializer()),
+            MapSerializer(String.Companion.serializer(), JsonElement.Companion.serializer()),
             this,
         )
     }
