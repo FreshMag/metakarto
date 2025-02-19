@@ -1,0 +1,17 @@
+package io.github.freshmag.core.json
+
+import io.github.freshmag.core.Element
+import io.github.freshmag.core.MapParser
+import io.github.freshmag.core.toMapElement
+import io.github.freshmag.utils.JsonUtils.toAnyMap
+import io.github.freshmag.utils.JsonUtils.toJsonMap
+import io.github.freshmag.utils.MapUtils.checkNulls
+
+class JsonParser : MapParser {
+    override fun parse(source: String): Map<String, Element> =
+        source
+            .toJsonMap()
+            .toAnyMap()
+            .checkNulls()
+            .toMapElement()
+}
