@@ -1,7 +1,7 @@
 {
   "name": "metakarto",
   "devDependencies": {
-    "semantic-release-preconfigured-conventional-commits": "1.1.122"
+    "semantic-release-preconfigured-conventional-commits": "1.1.125"
   },
   "engines": {
     "node": "^22.13.1"
