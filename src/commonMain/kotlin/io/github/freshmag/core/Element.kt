@@ -3,36 +3,96 @@ package io.github.freshmag.core
 /**
  * Represents a Element inside a Metakarto Map.
  */
-sealed class Element {
+sealed class Element(
+    open val name: String,
+    open val parent: Element?,
+) {
     /**
      * Represents a text element.
      */
-    data class Text(
+    class Text(
+        override val name: String,
+        override val parent: Element?,
         val value: String,
-    ) : Element()
+    ) : Element(name, parent) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Text) return false
+
+            if (name != other.name) return false
+            if (value != other.value) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = name.hashCode()
+            result = 31 * result + value.hashCode()
+            return result
+        }
+    }
 
     /**
      * Represents an array element.
      */
-    data class Array(
-        val value: List<Element>,
-    ) : Element()
+    class Array(
+        override val name: String,
+        override val parent: Element?,
+        valueInit: (Element) -> List<Element>,
+    ) : Element(name, parent) {
+        val value: List<Element> = valueInit(this)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Array) return false
+
+            if (name != other.name) return false
+            if (value != other.value) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = name.hashCode()
+            result = 31 * result + value.hashCode()
+            return result
+        }
+    }
 
     /**
      * Represents a nested object element.
      */
-    data class Object(
-        val value: Map<String, Element>,
-    ) : Element()
+    class Object(
+        override val name: String,
+        override val parent: Element?,
+        valueInit: (Element) -> Map<String, Element>,
+    ) : Element(name, parent) {
+        val value: Map<String, Element> = valueInit(this)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Object) return false
+
+            if (name != other.name) return false
+            if (value != other.value) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = name.hashCode()
+            result = 31 * result + value.hashCode()
+            return result
+        }
+    }
 
     /**
      * Represents a null element.
      */
-    class NullElement : Element() {
-        override fun equals(other: Any?): Boolean = other is NullElement
-
-        override fun hashCode(): Int = 0
-    }
+    data class NullElement(
+        override val name: String,
+        override val parent: Element?,
+    ) : Element(name, parent)
 
     /**
      * Converts this element to a dynamic type.
@@ -53,6 +113,7 @@ sealed class Element {
                 value.entries.joinToString(prefix = "{", postfix = "}", separator = ", ") {
                     "\"${it.key}\": ${it.value}"
                 }
+
             is NullElement -> "null"
         }
 }

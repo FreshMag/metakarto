@@ -15,7 +15,7 @@ class JsonSpec : StringSpec({
             """.trimMargin()
         val parser = JsonParser()
         val result = parser.parse(json)
-        result["key"] shouldBe Element.Text("value")
+        result["key"] shouldBe Element.Text("key", null, "value")
     }
 
     "A JSON string with an array should be parsed correctly" {
@@ -30,13 +30,17 @@ class JsonSpec : StringSpec({
             """.trimMargin()
         val parser = JsonParser()
         val result = parser.parse(json)
-        result["key"] shouldBe
+        val expected =
             Element.Array(
+                "key",
+                null,
+            ) { p ->
                 listOf(
-                    Element.Text("value1"),
-                    Element.Text("value2"),
-                ),
-            )
+                    Element.Text("key", p, "value1"),
+                    Element.Text("key", p, "value2"),
+                )
+            }
+        result["key"] shouldBe expected
     }
 
     "A JSON string with an object should be parsed correctly" {
@@ -53,11 +57,14 @@ class JsonSpec : StringSpec({
         val result = parser.parse(json)
         result["key"] shouldBe
             Element.Object(
+                "key",
+                null,
+            ) { p ->
                 mapOf(
-                    "subkey1" to Element.Text("value1"),
-                    "subkey2" to Element.Text("value2"),
-                ),
-            )
+                    "subkey1" to Element.Text("subkey1", p, "value1"),
+                    "subkey2" to Element.Text("subkey2", p, "value2"),
+                )
+            }
     }
 
     "A JSON string with a null value should be parsed correctly" {
@@ -69,7 +76,7 @@ class JsonSpec : StringSpec({
             """.trimMargin()
         val parser = JsonParser()
         val result = parser.parse(json)
-        result["key"] shouldBe Element.NullElement()
+        result["key"] shouldBe Element.NullElement("key", null)
     }
 
     "A JSON string with a nested object should be parsed correctly" {
@@ -87,15 +94,21 @@ class JsonSpec : StringSpec({
         val result = parser.parse(json)
         result["key"] shouldBe
             Element.Object(
+                "key",
+                null,
+            ) { p ->
                 mapOf(
                     "subkey1" to
                         Element.Object(
+                            "subkey1",
+                            p,
+                        ) { p2 ->
                             mapOf(
-                                "subsubkey1" to Element.Text("value1"),
-                            ),
-                        ),
-                ),
-            )
+                                "subsubkey1" to Element.Text("subsubkey1", p2, "value1"),
+                            )
+                        },
+                )
+            }
     }
 
     "A JSON string with a nested array should be parsed correctly" {
@@ -116,18 +129,27 @@ class JsonSpec : StringSpec({
         val result = parser.parse(json)
         result["key"] shouldBe
             Element.Array(
+                "key",
+                null,
+            ) { p ->
                 listOf(
                     Element.Object(
+                        "key",
+                        p,
+                    ) { p2 ->
                         mapOf(
-                            "subkey1" to Element.Text("value1"),
-                        ),
-                    ),
+                            "subkey1" to Element.Text("subkey1", p2, "value1"),
+                        )
+                    },
                     Element.Object(
+                        "key",
+                        p,
+                    ) { p2 ->
                         mapOf(
-                            "subkey2" to Element.Text("value2"),
-                        ),
-                    ),
-                ),
-            )
+                            "subkey2" to Element.Text("subkey2", p2, "value2"),
+                        )
+                    },
+                )
+            }
     }
 })

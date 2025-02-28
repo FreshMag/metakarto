@@ -7,9 +7,9 @@ class MapParserSpec : StringSpec({
 
     val testMapElements =
         mapOf(
-            "key1" to Element.Text("value1"),
-            "key2" to Element.Array(listOf(Element.Text("value2"))),
-            "key3" to Element.Object(mapOf("key4" to Element.Text("value3"))),
+            "key1" to Element.Text("key1", null, "value1"),
+            "key2" to Element.Array("key2", null) { listOf(Element.Text("key2", it, "value2")) },
+            "key3" to Element.Object("key3", null) { mapOf("key4" to Element.Text("key4", it, "value3")) },
         )
 
     val testMapAny =
