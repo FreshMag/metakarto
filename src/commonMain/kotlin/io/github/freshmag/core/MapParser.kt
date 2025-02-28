@@ -8,7 +8,7 @@ interface MapParser {
     /**
      * Parses the source string and returns a map of elements.
      */
-    fun parse(source: String): Map<String, Element>
+    fun parse(source: String): Element.Object
 }
 
 /**
@@ -23,6 +23,12 @@ fun Map<String, Element>.toMapAny(): Map<String, Any?> =
             is Element.NullElement -> null
         }
     }
+
+/**
+ * Converts a map of any values to a Object element with name "root".
+ */
+fun Map<String, Any?>.toElement(parent: Element? = null): Element.Object =
+    Element.Object("root", parent) { this.toMapElement(parent) }
 
 /**
  * Converts a map of elements to a map of strings. Note: null elements are converted to null values.

@@ -15,7 +15,7 @@ class JsonSpec : StringSpec({
             """.trimMargin()
         val parser = JsonParser()
         val result = parser.parse(json)
-        result["key"] shouldBe Element.Text("key", null, "value")
+        result.value["key"] shouldBe Element.Text("key", null, "value")
     }
 
     "A JSON string with an array should be parsed correctly" {
@@ -40,7 +40,7 @@ class JsonSpec : StringSpec({
                     Element.Text("key", p, "value2"),
                 )
             }
-        result["key"] shouldBe expected
+        result.value["key"] shouldBe expected
     }
 
     "A JSON string with an object should be parsed correctly" {
@@ -55,7 +55,7 @@ class JsonSpec : StringSpec({
             """.trimMargin()
         val parser = JsonParser()
         val result = parser.parse(json)
-        result["key"] shouldBe
+        result.value["key"] shouldBe
             Element.Object(
                 "key",
                 null,
@@ -76,7 +76,7 @@ class JsonSpec : StringSpec({
             """.trimMargin()
         val parser = JsonParser()
         val result = parser.parse(json)
-        result["key"] shouldBe Element.NullElement("key", null)
+        result.value["key"] shouldBe Element.NullElement("key", null)
     }
 
     "A JSON string with a nested object should be parsed correctly" {
@@ -92,7 +92,7 @@ class JsonSpec : StringSpec({
             """.trimMargin()
         val parser = JsonParser()
         val result = parser.parse(json)
-        result["key"] shouldBe
+        result.value["key"] shouldBe
             Element.Object(
                 "key",
                 null,
@@ -127,7 +127,7 @@ class JsonSpec : StringSpec({
             """.trimMargin()
         val parser = JsonParser()
         val result = parser.parse(json)
-        result["key"] shouldBe
+        result.value["key"] shouldBe
             Element.Array(
                 "key",
                 null,
