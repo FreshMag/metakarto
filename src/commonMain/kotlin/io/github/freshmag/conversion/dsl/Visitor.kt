@@ -6,9 +6,7 @@ import io.github.freshmag.core.Element
 /**
  * Visits an [Element] tree and provides a DSL for extracting values from it.
  */
-infix fun Element.visit(block: Visitor.() -> Unit) {
-    Visitor(this).apply(block)
-}
+infix fun <T> Element.visit(block: Visitor.() -> T): T = Visitor(this).run(block)
 
 /**
  * Class that holds DSL functions for extracting values from an [Element] tree.
@@ -18,48 +16,46 @@ class Visitor(
 ) {
     /**
      * Visit an element or throw an exception if it is missing. If [optional] is true, the element is allowed to be
-     * missing. [message] is used in the exception.
+     * missing. [message] is used in the exception. Returns the result of [block] if the element is present, otherwise
+     * null.
      */
-    private fun Element?.visitOrThrow(
+    private fun <T> Element?.visitOrThrow(
         optional: Boolean = false,
         message: String = "Required element missing",
-        block: (Element) -> Unit,
-    ) {
+        block: (Element) -> T,
+    ): T? =
         if (this != null) {
             block(this)
         } else {
-            if (!optional) throw IllegalArgumentException(message)
+            if (!optional) throw IllegalArgumentException(message) else null
         }
-    }
 
     /**
      * Visits the first element with any of the provided [names]. If [variations] is true, variations of the names are
      * also accepted. If [optional] is true, the element is allowed to be missing and the block is not called.
+     * Returns the result of [block] if the element is present, otherwise null.
      */
-    fun acceptAnyOf(
+    fun <T> acceptAnyOf(
         vararg names: String,
         optional: Boolean = false,
         variations: Boolean = true,
-        block: (Element) -> Unit,
-    ) {
+        block: (Element) -> T,
+    ): T? {
         require(names.isNotEmpty()) { "At least one name must be provided" }
         val namesToSearch = if (variations) variationsOf(names.toList()) else names.toList()
         val match = namesToSearch.firstNotNullOfOrNull { e.find(it) }
-        match.visitOrThrow(optional, "Required element missing: ${names.joinToString()}", block)
+        return match.visitOrThrow(optional, "Required element missing: ${names.joinToString()}", block)
     }
 
     /**
      * Visits the element with the provided [name]. If [optional] is true, the element is allowed to be missing and the
      * block is not called.
      */
-    fun accept(
+    fun <T> accept(
         name: String,
         optional: Boolean = false,
-        block: (Element) -> Unit,
-    ) {
-        val match = e.find(name)
-        match.visitOrThrow(optional, "Required element missing: $name", block)
-    }
+        block: (Element) -> T,
+    ): T? = e.find(name).visitOrThrow(optional, "Required element missing: $name", block)
 
     /**
      * Converts a text element to a text value. If the element is not a text element, null is returned.
@@ -132,22 +128,21 @@ class Visitor(
      * iterated over as well (i.e., the values of their keys are iterated), otherwise an [IllegalArgumentException] is
      * thrown.
      */
-    fun Element.acceptAll(
+    fun <T> Element.acceptAll(
         iterateObj: Boolean = false,
-        block: (Element) -> Unit,
-    ) {
+        block: (Element) -> T,
+    ): Iterable<T> =
         when (this) {
-            is Element.Array -> this.value.forEach(block)
+            is Element.Array -> this.value.map(block)
             is Element.Object ->
                 if (iterateObj) {
-                    this.value.values.forEach(block)
+                    this.value.values.map(block)
                 } else {
                     throw IllegalArgumentException("acceptAll() called on object type: $this")
                 }
 
             else -> throw IllegalArgumentException("acceptAll() called on non-iterable type: $this")
         }
-    }
 
     /**
      * Searches for an element with the provided [name] in an object. If the element is not found, null is returned.

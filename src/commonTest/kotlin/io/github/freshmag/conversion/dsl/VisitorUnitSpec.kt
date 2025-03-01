@@ -5,7 +5,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class VisitorSpec : StringSpec({
+class VisitorUnitSpec : StringSpec({
 
     "should accept any of multiple names" {
         val root =
@@ -155,19 +155,21 @@ class VisitorSpec : StringSpec({
         }
     }
 
+    val testObj =
+        Element.Object("root", null) {
+            mapOf(
+                "key" to
+                    Element.Object("key", null) {
+                        mapOf(
+                            "key1" to Element.Text("key1", null, "A"),
+                            "key2" to Element.Text("key2", null, "B"),
+                        )
+                    },
+            )
+        }
+
     "should acceptAll on an object when iterateObj is true" {
-        val obj =
-            Element.Object("root", null) {
-                mapOf(
-                    "key" to
-                        Element.Object("key", null) {
-                            mapOf(
-                                "key1" to Element.Text("key1", null, "A"),
-                                "key2" to Element.Text("key2", null, "B"),
-                            )
-                        },
-                )
-            }
+        val obj = testObj
 
         obj visit {
             accept("key") { elem ->
@@ -175,6 +177,20 @@ class VisitorSpec : StringSpec({
                 elem.acceptAll(iterateObj = true) { values.add(it.toText().value) }
 
                 values shouldBe listOf("A", "B")
+            }
+        }
+    }
+
+    "should be able to visit the parent" {
+        val obj = testObj
+
+        obj visit {
+            accept("key") { elem ->
+                elem.parent?.visit {
+                    acceptAnyOf("key") {
+                        it.toObjectOrNull() shouldBe elem
+                    }
+                }
             }
         }
     }
