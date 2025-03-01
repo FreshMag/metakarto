@@ -17,7 +17,7 @@ class VisitorUnitSpec : StringSpec({
             }
 
         root visit {
-            acceptAnyOf("name", "id") { elem ->
+            acceptAnyOfOrThrow("name", "id") { elem ->
                 elem.toText().value shouldBe "Alice"
             }
         }
@@ -32,7 +32,7 @@ class VisitorUnitSpec : StringSpec({
             }
 
         root visit {
-            acceptAnyOf("id", "ID") { elem ->
+            acceptAnyOfOrThrow("id", "ID") { elem ->
                 elem.toText().value shouldBe "456"
             }
         }
@@ -43,7 +43,7 @@ class VisitorUnitSpec : StringSpec({
 
         shouldThrow<IllegalArgumentException> {
             root visit {
-                acceptAnyOf("missing") { }
+                acceptAnyOfOrThrow("missing") { }
             }
         }
     }
@@ -187,7 +187,7 @@ class VisitorUnitSpec : StringSpec({
         obj visit {
             accept("key") { elem ->
                 elem.parent?.visit {
-                    acceptAnyOf("key") {
+                    acceptAnyOfOrThrow("key") {
                         it.toObjectOrNull() shouldBe elem
                     }
                 }

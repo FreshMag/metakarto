@@ -1,6 +1,5 @@
 package io.github.freshmag.conversion.dsl
 
-import io.github.freshmag.conversion.variationsOf
 import io.github.freshmag.core.Element
 
 /**
@@ -9,53 +8,41 @@ import io.github.freshmag.core.Element
 infix fun <T> Element.visit(block: Visitor.() -> T): T = Visitor(this).run(block)
 
 /**
+ * Shortcut for accepting any of the provided [names] and calling `visit` on the result, opening a new visiting scope.
+ * Throws an [IllegalArgumentException] if any of the [names] provided are missing.
+ */
+fun <T> Visitor.acceptAnyAndVisit(
+    vararg names: String,
+    block: Visitor.() -> T,
+): T? = acceptAnyOfOrThrow(names.toList()) { it.visit(block) }
+
+/**
+ * Shortcut for accepting any of the provided [names] and calling `visit` on the result, opening a new visiting scope.
+ * Returns null if any of the [names] provided are missing.
+ */
+fun <T> Visitor.acceptAnyAndVisitOrNull(
+    vararg names: String,
+    block: Visitor.() -> T,
+): T? = acceptAnyOfOrNull(names.toList()) { it.visit(block) }
+
+/**
+ * Shortcut for accepting any of the provided [names] and calling `visit` on the result, opening a new visiting scope.
+ */
+fun <T> Visitor.acceptAnyAndVisit(
+    names: List<String>,
+    block: Visitor.() -> T,
+): T? = acceptAnyOfOrThrow(names) { it.visit(block) }
+
+/**
  * Class that holds DSL functions for extracting values from an [Element] tree.
  */
 class Visitor(
-    private val e: Element,
+    internal val e: Element,
 ) {
     /**
-     * Visit an element or throw an exception if it is missing. If [optional] is true, the element is allowed to be
-     * missing. [message] is used in the exception. Returns the result of [block] if the element is present, otherwise
-     * null.
+     * Visit an element or return null if it is missing. Returns the result of [block] if the element is present.
      */
-    private fun <T> Element?.visitOrThrow(
-        optional: Boolean = false,
-        message: String = "Required element missing",
-        block: (Element) -> T,
-    ): T? =
-        if (this != null) {
-            block(this)
-        } else {
-            if (!optional) throw IllegalArgumentException(message) else null
-        }
-
-    /**
-     * Visits the first element with any of the provided [names]. If [variations] is true, variations of the names are
-     * also accepted. If [optional] is true, the element is allowed to be missing and the block is not called.
-     * Returns the result of [block] if the element is present, otherwise null.
-     */
-    fun <T> acceptAnyOf(
-        vararg names: String,
-        optional: Boolean = false,
-        variations: Boolean = true,
-        block: (Element) -> T,
-    ): T? {
-        require(names.isNotEmpty()) { "At least one name must be provided" }
-        val namesToSearch = if (variations) variationsOf(names.toList()) else names.toList()
-        val match = namesToSearch.firstNotNullOfOrNull { e.find(it) }
-        return match.visitOrThrow(optional, "Required element missing: ${names.joinToString()}", block)
-    }
-
-    /**
-     * Visits the element with the provided [name]. If [optional] is true, the element is allowed to be missing and the
-     * block is not called.
-     */
-    fun <T> accept(
-        name: String,
-        optional: Boolean = false,
-        block: (Element) -> T,
-    ): T? = e.find(name).visitOrThrow(optional, "Required element missing: $name", block)
+    internal fun <T> Element?.visitOrNull(block: (Element) -> T): T? = this?.let { block(it) }
 
     /**
      * Converts a text element to a text value. If the element is not a text element, null is returned.
@@ -147,9 +134,15 @@ class Visitor(
     /**
      * Searches for an element with the provided [name] in an object. If the element is not found, null is returned.
      */
-    private fun Element.find(name: String): Element? =
+    internal fun Element.find(name: String): Element? =
         when (this) {
             is Element.Object -> this.value[name]
             else -> null
         }
+
+    /**
+     * Searches for an element with any of the provided [names] in an object. If the element is not found, null is
+     * returned.
+     */
+    internal fun Element.findAny(names: Collection<String>): Element? = names.firstNotNullOfOrNull { find(it) }
 }
