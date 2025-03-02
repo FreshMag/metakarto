@@ -1,5 +1,6 @@
 package io.github.freshmag.conversion.dsl
 
+import io.github.freshmag.conversion.variationsOf
 import io.github.freshmag.core.Element
 
 /**
@@ -43,6 +44,41 @@ class Visitor(
      * Visit an element or return null if it is missing. Returns the result of [block] if the element is present.
      */
     internal fun <T> Element?.visitOrNull(block: (Element) -> T): T? = this?.let { block(it) }
+
+    /**
+     * Visits the first element with any of the provided [names]. If [variations] is true, variations of the names are
+     * also accepted. Returns the result of [block] if the element is present, otherwise null.
+     */
+    fun <T> Visitor.acceptAnyOfOrNull(
+        names: List<String>,
+        variations: Boolean = true,
+        block: (Element) -> T,
+    ): T? {
+        require(names.isNotEmpty()) { "At least one name must be provided" }
+        val namesToSearch = if (variations) variationsOf(names.toList()) else names.toList()
+        val match = e.findAny(namesToSearch)
+        return match.visitOrNull(block)
+    }
+
+    /**
+     * Visits all elements with the provided lists of [names]. Each list is treated as an alternative name for the same
+     * element. If [variations] is true, variations of the names are also accepted. Finally, the [block] is called with
+     * the list of elements. If any of the elements are missing, null is returned.
+     */
+    fun <T> Visitor.acceptAllOfOrNull(
+        names: List<List<String>>,
+        variations: Boolean = false,
+        block: (List<Element>) -> T,
+    ): T? {
+        require(names.isNotEmpty()) { "At least one name must be provided" }
+        val namesToSearch = if (variations) names.map { variationsOf(it) } else names.toList()
+        val matches = namesToSearch.mapNotNull { e.findAny(it) }
+        return if (matches.size == names.size) {
+            block(matches)
+        } else {
+            null
+        }
+    }
 
     /**
      * Converts a text element to a text value. If the element is not a text element, null is returned.
